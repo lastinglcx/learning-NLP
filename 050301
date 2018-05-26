@@ -1,0 +1,63 @@
+# -*- coding: utf-8 -*-
+import nltk
+from nltk.corpus import brown
+#条件频率分布函数
+
+cfd=nltk.ConditionalFreqDist(
+    (genre,word)
+    for genre in brown.categories()
+    for word in brown.words(categories=genre))
+
+genre_word=[(genre,word)
+            for genre in [('news','romance')]
+            for word in brown.words(categories=genre)]
+
+#len(genre_word)
+print len(genre_word)
+print genre_word[:4]
+print genre_word[-4:]
+
+#函数调用
+cfd=nltk.ConditionalFreqDist(genre_word)
+#print cfd
+#上行输出结果：<ConditionalFreqDist with 1 conditions>
+print cfd.conditions()
+cfd['romance']['could']
+
+#inaugural语料库 文件名前四位为年份，fileid[:4]取年份
+from nltk.corpus import inaugural
+cfd=nltk.ConditionalFreqDist(
+    (target,fileid[:4])
+    for fileid in inaugural.fileids()
+    for w in inaugural.words(fileid)
+    for target in ['america','citizen']
+    if w.lower().startswith(target))
+cfd.plot()
+
+from nltk.corpus import udhr
+languages = ['Chickasaw','English','German_Deutsch','Greenlandic_Inuktikut','Hungarian_Magyer','Ibibio_Efik']
+udhr.fileids()
+cfd=nltk.ConditionalFreqDist(
+    (lang,len(word))
+    for lang in languages
+    for word in udhr.words(lang+'-Latin1'))
+
+cfd.tabulate(confitions=['English','German_Deutsch'],
+             samples=range(10),cumulative=True)
+
+
+
+#双连词生成随机文本
+def generate_model(cfdist,word,num=15):
+     # num=15为停止限制条件
+    for i in range(num):
+        print word,
+        word = cfdist[word].max()
+text = nltk.corpus.genesis.words('english-kjv.txt')
+bigrams = nltk.bigrams(text)
+cfd = nltk.ConditionalFreqDist(bigrams)
+
+print cfd['living']
+print list(cfd['living'])
+
+generate_model(cfd,'living')
